@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#10302c">
+    <title>Infirmary Appointment Scheduling System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ============================================================
+         1. LOGIN SCREEN  (shown when nobody is logged in)
+         ============================================================ -->
+    <div id="login-screen" class="authwrap">
+
+        <section class="hero">
+            <div class="brand">
+                <span class="logo">
+                    <svg viewBox="0 0 24 24"><path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z" fill="currentColor"/></svg>
+                </span>
+                <b>Infirmary Scheduler</b>
+            </div>
+            <svg class="pulse" viewBox="0 0 520 90" aria-hidden="true">
+                <polyline points="0,50 150,50 175,50 195,12 220,82 242,30 258,50 520,50"/>
+            </svg>
+            <h1>Infirmary visits, scheduled with care.</h1>
+            <p>Patients book a visit, staff confirm it, and the infirmary stays on schedule.</p>
+        </section>
+
+        <main class="authbox">
+            <h2>Log in</h2>
+            <p class="muted">Use the account given to you by the infirmary.</p>
+
+            <!-- error message appears here (JS fills it) -->
+            <div id="login-err"></div>
+
+            <form class="card" data-form="login">
+                <label>Username
+                    <input name="username" type="text" required autocomplete="username">
+                </label>
+                <label>Password
+                    <input name="password" type="password" required autocomplete="current-password">
+                </label>
+                <div class="row">
+                    <button>Log in</button>
+                    <button type="button" class="ghost" data-act="visitor">Continue as Visitor</button>
+                </div>
+            </form>
+
+            <div class="card demo">
+                <b>Connected to MongoDB</b>
+                <p class="muted">
+                    Use your infirmary account. Records are saved on the server.
+                </p>
+                <button type="button" class="link" data-act="reset">Refresh server data</button>
+            </div>
+        </main>
+    </div>
+
+
+    <!-- ============================================================
+         2. THE APP  (shown after login)
+         The menu links below are the single place that says
+         WHO can open WHAT:  data-roles="admin staff ..."
+         CSS (style.css, "ROLE VISIBILITY") hides links the role can't use.
+         ============================================================ -->
+    <div id="app-screen" class="layout" hidden>
+
+        <aside class="side">
+
+            <div class="brand">
+                <span class="logo">
+                    <svg viewBox="0 0 24 24"><path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z" fill="currentColor"/></svg>
+                </span>
+                <div>
+                    <b>Infirmary Scheduler</b>
+                    <small>Appointment system</small>
+                </div>
+            </div>
+
+            <nav>
+                <a href="#/dashboard" data-roles="admin staff patient viewer">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    Dashboard
+                </a>
+                <a href="#/book" data-roles="patient">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>
+                    Book appointment
+                </a>
+                <a href="#/appointments" data-roles="admin staff patient viewer">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                    Appointments
+                </a>
+                <a href="#/patients" data-roles="admin staff">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 010 7M18 14.5c2 .7 3.5 2.6 3.5 5.5"/></svg>
+                    Patients
+                </a>
+                <a href="#/doctors" data-roles="admin staff patient viewer visitor">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v6a4 4 0 008 0V3M10 13v3a4 4 0 008 0v-1"/><circle cx="18" cy="12" r="2"/></svg>
+                    Doctors
+                </a>
+                <a href="#/services" data-roles="admin viewer">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M12 11v5M9.5 13.5h5"/></svg>
+                    Services
+                </a>
+                <a href="#/accounts" data-roles="admin">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+                    Accounts
+                </a>
+                <a href="#/roles" data-roles="admin">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+                    Roles and permissions
+                </a>
+                <a href="#/logs" data-roles="admin">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+                    Activity log
+                </a>
+                <a href="#/reports" data-roles="admin">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+                    Reports
+                </a>
+                <a href="#/profile" data-roles="patient">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+                    My profile
+                </a>
+            </nav>
+
+            <!-- who is logged in (JS fills the 3 empty spots) -->
+            <div class="me">
+                <span id="me-icon"></span>
+                <div class="mi">
+                    <span class="name" id="me-name"></span>
+                    <span id="me-role"></span>
+                </div>
+                <button class="ghost" data-act="changePassword" id="change-password-btn">Change password</button>
+                <button class="ghost" data-act="logout" id="logout-btn">Log out</button>
+            </div>
+
+        </aside>
+
+        <div class="content">
+            <div class="crumb" id="today"></div>
+
+            <!-- the current page (JS puts the table/form for the chosen menu item here) -->
+            <main id="page"></main>
+        </div>
+    </div>
+
+
+    <!-- pop-up boxes and the small message at the bottom -->
+    <div id="modal" class="overlay" hidden></div>
+    <div id="toast" role="status"></div>
+
+
+    <!-- Order matters: data → roles → auth → views → actions → app -->
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/roles.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/views.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
