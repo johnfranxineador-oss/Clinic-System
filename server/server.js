@@ -14,6 +14,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const activityLogRoutes = require('./routes/activityLogRoutes');
 
 const app = express();
+const mongoose = require('mongoose');
 
 app.use(
   cors({
@@ -33,6 +34,15 @@ app.get('/api', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'CvSU Infirmary Appointment System API',
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+  res.status(connected ? 200 : 500).json({
+    success: connected,
+    database: mongoose.connection.name || null,
+    connected,
   });
 });
 

@@ -20,8 +20,8 @@ const done = async () => {
     if (DB.saving) return;
     DB.saving = true;
     document.querySelectorAll('button').forEach(b => b.disabled = true);
-    try { await DB.save(); render(); }
-    catch (error) { render(); toast(error.message); }
+    try { await DB.save(); render(); return true; }
+    catch (error) { render(); toast(error.message); return false; }
     finally { DB.saving = false; document.querySelectorAll('button').forEach(b => b.disabled = false); }
 };
 const PHONE = /^[0-9+\-\s()]{7,18}$/;
@@ -290,7 +290,7 @@ const Forms = {
         toast('Saved.');
         done();
     },
-    profile(f, d) {
+    async profile(f, d) {
         if (!need('patient'))
             return;
         const p = d.get('phone').trim(), n = d.get('name').trim();
@@ -300,9 +300,11 @@ const Forms = {
             name: n, phone: p, dob: d.get('dob'), address: d.get('address').trim()
         }); // student number is never changed here
         DB.log('Updated own profile');
-        S.ep = false;
-        toast('Saved.');
-        done();
+        if (await done()) {
+            S.ep = false;
+            render();
+            toast('Saved.');
+        }
     },
     doctor(f, d) {
         if (!need('admin', 'staff') || !S.m)

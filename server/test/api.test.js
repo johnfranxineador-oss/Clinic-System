@@ -96,6 +96,23 @@ test('MongoDB CRUD, validation, appointment audit logs, and reconnect persistenc
     context.testId = ids.users;
     await vm.runInContext("Q.user(testId).name = 'Updated through frontend'; DB.save()", context);
     assert.equal((await request(`users/${ids.users}`)).fullName, 'Updated through frontend');
+    // A fresh login must edit the same user object that the adapter saves.
+    const authContext = vm.createContext({
+      window: { CVSU_API_URL: base }, location: { protocol: 'http:', hostname: 'localhost', port: '5000' },
+      fetch, structuredClone, console, Intl, render() {}, toast() {},
+      sessionStorage: { setItem() {}, removeItem() {} }, setTimeout() { return 0; }, clearTimeout() {}
+    });
+    for (const file of ['data.js', 'api.js', 'auth.js']) {
+      vm.runInContext(fs.readFileSync(path.join(__dirname, '../../js', file), 'utf8'), authContext);
+    }
+    authContext.username = user.username;
+    await vm.runInContext('DB.init()', authContext);
+    assert.equal(await vm.runInContext("Auth.login(username, 'Replacement-password-123')", authContext), '');
+    assert.equal(vm.runInContext('Auth.user === Q.user(Auth.user.id)', authContext), true);
+    await vm.runInContext("Auth.user.name = 'Profile saved after login'; Auth.user.photo = 'data:image/jpeg;base64,dGVzdA=='; DB.save()", authContext);
+    const savedProfile = await request(`users/${ids.users}`);
+    assert.equal(savedProfile.fullName, 'Profile saved after login');
+    assert.equal(savedProfile.photo, 'data:image/jpeg;base64,dGVzdA==');
     assert.ok((await fetch(base.replace('/api', '/'))).headers.get('content-type').includes('text/html'));
     assert.equal((await fetch(base.replace('/api', '/js/api.js'))).status, 200);
     await request(`users/${ids.users}`, 'PATCH', { role: 'invalid' }, 400);

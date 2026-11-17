@@ -31,7 +31,8 @@ const Auth = {
         this.touch();
     }, // no account, nothing saved
     set(u) {
-        this.user = u;
+        // Keep profile/photo edits attached to the snapshot that DB.save compares.
+        this.user = Q.user(u.id) || u;
         try {
             sessionStorage.setItem('clinic_uid', u.id);
         }

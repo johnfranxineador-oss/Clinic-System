@@ -4,6 +4,12 @@ Standalone REST API for the Cavite State University (CvSU) Infirmary Appointment
 
 ## Connected frontend
 
+### Optional sample accounts
+
+Run `npm.cmd run setup-demo` from `server` with MongoDB running. This creates `demo.admin` (admin), `demo.staff` (staff), and `demo.patient` (student, displayed as patient). All newly created sample accounts use `Infirmary@2026`. The login page's **Demo accounts** card lists the credentials to enter in the login form. **Continue as Visitor** opens the existing guest view without an account.
+
+These accounts persist in MongoDB; setup can be rerun and leaves existing profiles and passwords unchanged. Your original `admin` account is preserved. Demo actions save real changes to the configured database, so use a development database. Remove or deactivate sample accounts before public deployment. If you change a demo password, use its new password instead of the sample password listed on the card.
+
 The server now serves the existing interface at **http://localhost:5000/**, along with `/js` and `/css`. `GET /api` returns the API greeting. Restart any previously running server to load these changes.
 
 ```powershell
@@ -74,8 +80,14 @@ server/
 
 ## MongoDB setup
 
+The application uses `clinic_db`. Existing local records were copied from `cvsu_infirmary`, which remains as a backup. Restart the API after changing `.env`; a running process keeps its previous connection until restarted. In Compass, refresh the database list and open `clinic_db`.
+
+The application connection explicitly selects `clinic_db` in `config/db.js`, even when an older shell environment supplies a URI ending in another database name. `MONGODB_URI` still determines the MongoDB server and credentials. `GET /api/health` reports the active database name and connection state without exposing connection strings. Automated integration tests use their separately specified test database directly.
+
+For another installation that still has data in `cvsu_infirmary`, stop the API and run `node scripts/migrate-clinic-db.js` from `server`, then set the database name in `MONGODB_URI` to `clinic_db` and restart. The script copies documents, ObjectIds, and indexes on the configured MongoDB server. It refuses a nonempty target and never deletes the source. Do not run it on a fresh installation; ordinary setup creates `clinic_db` automatically.
+
 1. Install [MongoDB Community Server](https://www.mongodb.com/try/download/community) and start it on the default port `27017`.
-2. No manual database creation is required. Mongoose creates the `cvsu_infirmary` database and collections on the first write.
+2. No manual database creation is required. Mongoose creates the `clinic_db` database and collections on the first write.
 3. Collections used: `users`, `doctors`, `services`, `appointments`, `activity_logs`.
 
 Confirm MongoDB is running before `npm start`. A failed connection stops the process and does not print the connection string.
@@ -97,7 +109,7 @@ Copy-Item .env.example .env
 | Name | Example | Purpose |
 | --- | --- | --- |
 | `PORT` | `5000` | HTTP port |
-| `MONGODB_URI` | `mongodb://localhost:27017/cvsu_infirmary` | MongoDB connection string |
+| `MONGODB_URI` | `mongodb://localhost:27017/clinic_db` | MongoDB connection string |
 
 `.gitignore` excludes `.env` and `node_modules/`.
 
@@ -393,10 +405,10 @@ The log list should contain `create`, then `update`, then `delete` for that appo
 2. Stop the API (`Ctrl+C`) and start it again with `npm run dev`.
 3. `GET /api/users/USER_OBJECT_ID` still returns `200` and the same document.
 
-The record lives in MongoDB, not in server memory. Dropping the `cvsu_infirmary` database is what clears it. From a machine with the MongoDB shell on `PATH`:
+The record lives in MongoDB, not in server memory. Dropping the `clinic_db` database is what clears it. From a machine with the MongoDB shell on `PATH`:
 
 ```powershell
-mongosh cvsu_infirmary --eval "db.dropDatabase()"
+mongosh clinic_db --eval "db.dropDatabase()"
 ```
 
 MongoDB Compass can drop the same database when `mongosh` is not installed.
@@ -406,7 +418,7 @@ MongoDB Compass can drop the same database when `mongosh` is not installed.
 Node.js 18 or newer is required for the test runner and built-in fetch. Run `npm test` for database-independent HTTP checks. To also exercise real MongoDB CRUD, validation, audit logs, and persistence after disconnect/reconnect, start MongoDB and run from `server` in PowerShell:
 
 ```powershell
-$env:TEST_MONGODB_URI = 'mongodb://127.0.0.1:27017/cvsu_infirmary_test'
+$env:TEST_MONGODB_URI = 'mongodb://127.0.0.1:27017/clinic_db_test'
 npm.cmd test
 ```
 

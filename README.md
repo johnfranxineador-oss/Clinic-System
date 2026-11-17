@@ -16,6 +16,8 @@ npm.cmd start
 
 Save the generated administrator password printed by setup. Open **http://localhost:5000** and log in with username `admin`. Each installation uses its own MongoDB database by default; existing records are not distributed with the source code.
 
+For easy local role previews, run `npm.cmd run setup-demo` inside `server`. The login page's **Demo accounts** card lists the sample usernames: `demo.admin`, `demo.staff`, and `demo.patient`, with password `Infirmary@2026`. Enter these in the login form. Existing accounts are preserved. Visitors use **Continue as Visitor** without a password.
+
 See [server/README.md](server/README.md) for API documentation, account setup, password reset, and testing instructions.
 
 ## Project folders

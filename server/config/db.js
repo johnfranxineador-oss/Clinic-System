@@ -9,8 +9,8 @@ const connectDB = async () => {
     throw new Error('MONGODB_URI is not set');
   }
 
-  await mongoose.connect(uri);
-  console.log('MongoDB connected');
+  await mongoose.connect(uri, { dbName: 'clinic_db' });
+  console.log(`MongoDB connected: ${mongoose.connection.name}`);
 };
 
 module.exports = connectDB;

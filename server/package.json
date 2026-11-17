@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "test": "node --test",
     "setup-admin": "node scripts/setup-admin.js",
+    "setup-demo": "node scripts/setup-demo.js",
     "reset-admin-password": "node scripts/reset-admin-password.js"
   },
   "dependencies": {
